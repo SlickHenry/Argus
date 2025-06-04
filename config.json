@@ -1,0 +1,64 @@
+{
+  "oauth2": {
+    "client_id": "ninja-api-client-id-here",
+    "client_secret": "ninja-api-client-secret-here",
+    "auth_url": "https://app.ninjarmm.com/oauth/authorize",
+    "token_url": "https://app.ninjarmm.com/oauth/token",
+    "redirect_url": "http://localhost:8080/callback",
+    "scope": "monitoring",
+    "flow_type": "client_credentials"
+  },
+  "organizations": {
+    "mode": "include",
+    "organization_ids": [
+	"1"
+    ],
+    "default_org_id": "1"
+  },
+  "syslog": {
+    "server": "syslog-server-address",
+    "port": 514,
+    "protocol": "tcp"
+  },
+  "api": {
+    "base_url": "https://app.ninjarmm.com/v2",
+    "endpoints": [
+      "/alerts",
+      "/activities"
+    ]
+  },
+  "field_mappings": {
+    "/alerts": {
+      "uid": "externalId",
+      "id": "externalId", 
+      "type": "cat",
+      "message": "msg",
+      "severity": "cs1",
+      "status": "outcome",
+      "createdAt": "rt",
+      "deviceName": "dhost",
+      "organizationId": "cs4",
+      "organizationName": "cs4Label"
+    },
+    "/activities": {
+      "uid": "externalId",
+      "type": "cat",
+      "message": "msg", 
+      "status": "outcome",
+      "timestamp": "rt",
+      "deviceName": "dhost",
+      "organizationId": "cs4",
+      "organizationName": "cs4Label"
+    },
+    "default": {
+      "id": "externalId",
+      "type": "cat",
+      "message": "msg",
+      "timestamp": "rt",
+      "deviceName": "dhost",
+      "organizationId": "cs4",
+      "organizationName": "cs4Label"
+    }
+  },
+  "polling_interval_seconds": 60
+}
