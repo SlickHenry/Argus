@@ -337,6 +337,85 @@ The application provides detailed logging:
 - **Access**: Limit file permissions on config and state files
 - **Monitoring**: Monitor for authentication failures and API errors
 
+## Automated Deployment (Ubuntu 22.04)
+
+### Quick Setup Script
+
+For Ubuntu 22.04 systems, use the automated deployment script to install and configure the service:
+
+```bash
+# Download the deployment script
+wget https://raw.githubusercontent.com/SlickHenry/Argus/refs/heads/main/deploy-argus-ninja-poller.sh
+
+# Make executable and run
+chmod +x deploy-argus-ninja-poller.sh
+sudo ./deploy-argus-ninja-poller.sh
+```
+
+The script automatically:
+- Installs Go and build dependencies via apt
+- Downloads and compiles the application from source
+- Creates a secure service user (`argus-poller`) 
+- Sets up systemd service with security hardening
+- Configures log rotation and directory permissions
+- Places files in standard system locations
+
+### Post-Installation Configuration
+
+After running the deployment script:
+
+1. **Configure the service**:
+   ```bash
+   sudo nano /etc/argus-ninja-poller/config.json
+   ```
+
+2. **Required settings**:
+   - Set `oauth2.client_id` and `oauth2.client_secret`
+   - Configure `syslog.server` address
+   - Update `organizations.organization_ids`
+
+3. **Test configuration**:
+   ```bash
+   sudo -u argus-poller /usr/local/bin/argus-ninja-poller /etc/argus-ninja-poller/config.json --list-orgs
+   ```
+
+4. **Start the service**:
+   ```bash
+   sudo systemctl start argus-ninja-poller
+   sudo systemctl status argus-ninja-poller
+   ```
+
+### File Locations
+
+| Component | Location |
+|-----------|----------|
+| Binary | `/usr/local/bin/argus-ninja-poller` |
+| Configuration | `/etc/argus-ninja-poller/config.json` |
+| State file | `/etc/argus-ninja-poller/state.json` |
+| Logs | `/var/log/argus-ninja-poller.log` |
+| Service file | `/etc/systemd/system/argus-ninja-poller.service` |
+
+### Service Management
+
+```bash
+# Service control
+sudo systemctl start argus-ninja-poller     # Start
+sudo systemctl stop argus-ninja-poller      # Stop
+sudo systemctl restart argus-ninja-poller   # Restart
+sudo systemctl status argus-ninja-poller    # Status
+
+# View logs
+sudo journalctl -u argus-ninja-poller -f    # Follow systemd logs
+tail -f /var/log/argus-ninja-poller.log     # Follow application logs
+
+# Reset state (start fresh collection)
+sudo systemctl stop argus-ninja-poller
+sudo -u argus-poller /usr/local/bin/argus-ninja-poller /etc/argus-ninja-poller/config.json --reset-state
+sudo systemctl start argus-ninja-poller
+```
+
+The service runs as a restricted user with comprehensive systemd security settings including read-only filesystem access, capability restrictions, and system call filtering.
+
 ## License
 
 This project is provided as-is for educational and operational use. Ensure compliance with NinjaOne API terms of service and your organization's security policies.
